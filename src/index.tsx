@@ -76,7 +76,7 @@ function SlideOutFromTheBottomModal<T>({
     Platform.OS === "ios" &&
     !Platform.isPad &&
     !Platform.isTVOS &&
-    height === iphoneXHeight
+    parentHeight === iphoneXHeight
       ? iphoneXInset
       : 0;
 
