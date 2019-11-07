@@ -13,7 +13,6 @@ import {
   Text
 } from "react-native";
 import { useDarkMode } from "react-native-dark-mode";
-import { SafeAreaProvider, useSafeArea } from "react-native-safe-area-view";
 
 import actionSheetStyles, {
   darkPalette,
@@ -29,6 +28,9 @@ const disappearDuration = 100;
 const fadeInDuration = 50;
 const fadeOutDuration = 200;
 const minWidthForCentered = 800; // logical units? maybe adjust
+
+const iphoneXHeight = 896;
+const iphoneXInset = 20;
 
 type ActivitySheetProps<T> = {
   safeBottom?: boolean;
@@ -69,7 +71,14 @@ function SlideOutFromTheBottomModal<T>({
   const [bottomOffset, setBottomOffset] = React.useState(-1);
   const [height, setHeight] = React.useState(-1);
 
-  const { bottom: bottomInset } = useSafeArea();
+  // iphone X needs a special inset
+  const bottomInset =
+    Platform.OS === "ios" &&
+    !Platform.isPad &&
+    !Platform.isTVOS &&
+    height === iphoneXHeight
+      ? iphoneXInset
+      : 0;
 
   React.useEffect(() => {
     if (parentHeight < 0 || bottomInset < 0) {
@@ -294,13 +303,9 @@ export default function ActivitySheet<T>(props: ActivitySheetProps<T>) {
     return () => Dimensions.removeEventListener("change", handler);
   }, []);
 
-  return (
-    <SafeAreaProvider>
-      {width > minWidthForCentered ? (
-        <DisplayInTheCenterModal {...props} />
-      ) : (
-        <SlideOutFromTheBottomModal {...props} />
-      )}
-    </SafeAreaProvider>
+  return width > minWidthForCentered ? (
+    <DisplayInTheCenterModal {...props} />
+  ) : (
+    <SlideOutFromTheBottomModal {...props} />
   );
 }
