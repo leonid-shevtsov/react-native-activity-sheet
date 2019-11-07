@@ -19,6 +19,6 @@
     "typescript": "^3.7.0"
   },
   "scripts": {
-    "prepublish": "tsc"
+    "prepublish": "node_modules/.bin/tsc"
   }
 }
