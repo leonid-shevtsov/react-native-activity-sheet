@@ -29,8 +29,9 @@ const fadeInDuration = 50;
 const fadeOutDuration = 200;
 const minWidthForCentered = 800; // logical units? maybe adjust
 
-const iphoneXHeight = 896;
-const iphoneXInset = 20;
+const iphoneXHeight = 812;
+const iphoneXMaxHeight = 896;
+const iphoneXInset = 24;
 
 type ActivitySheetProps<T> = {
   safeBottom?: boolean;
@@ -76,7 +77,7 @@ function SlideOutFromTheBottomModal<T>({
     Platform.OS === "ios" &&
     !Platform.isPad &&
     !Platform.isTVOS &&
-    parentHeight === iphoneXHeight
+    (parentHeight === iphoneXHeight || parentHeight === iphoneXMaxHeight)
       ? iphoneXInset
       : 0;
 
