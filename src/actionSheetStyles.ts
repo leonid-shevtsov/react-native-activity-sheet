@@ -28,7 +28,8 @@ const actionSheetStyles = StyleSheet.create({
   cancelButton: {
     borderRadius: BORDER_RADIUS,
     height: 57,
-    justifyContent: "center"
+    justifyContent: "center",
+    marginBottom: 15
   },
   cancelText: {
     fontSize: 20,
