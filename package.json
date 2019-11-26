@@ -7,7 +7,7 @@
   "repository": "https://github.com/leonid-shevtsov/react-native-activity-sheet",
   "author": "Leonid Shevtsov <leonid@shevtsov.me>",
   "license": "MIT",
-  "dependencies": {
+  "peerDependencies": {
     "react": "^16.11.0",
     "react-native": "^0.61.4",
     "react-native-dark-mode": "^0.2.0"
