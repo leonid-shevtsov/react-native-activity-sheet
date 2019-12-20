@@ -65,8 +65,6 @@ function SlideOutFromTheBottomModal<T>({
 
   const colors = isDarkMode ? darkPalette : lightPalette;
 
-  React.useEffect(() => {}, [fullOverlayOpacity]);
-
   const [keyboardY, setKeyboardY] = React.useState(-1);
   const [parentHeight, setParentHeight] = React.useState(-1);
   const [bottomOffset, setBottomOffset] = React.useState(-1);
