@@ -112,6 +112,7 @@ function SlideOutFromTheBottomModal<T>({
     ]).start();
   }, [height, bottomOffset, fullOverlayOpacity]);
 
+  const animatingOutRef = React.useRef(false);
   const animateOut = (result: T | undefined) => {
     Animated.parallel([
       Animated.timing(slideOutOffset.current, {
@@ -124,7 +125,13 @@ function SlideOutFromTheBottomModal<T>({
         duration: disappearDuration,
         useNativeDriver: true
       })
-    ]).start(() => dismiss(result));
+    ]).start(() => {
+      if (animatingOutRef.current) {
+        return;
+      }
+      animatingOutRef.current = true;
+      dismiss(result);
+    });
   };
 
   React.useEffect(() => {
@@ -253,12 +260,19 @@ function DisplayInTheCenterModal<T>({
     }).start();
   }, []);
 
+  const animatingOutRef = React.useRef(false);
   const animateOut = (result: T | undefined) => {
     Animated.timing(opacity.current, {
       toValue: 0,
       duration: fadeOutDuration,
       useNativeDriver: true
-    }).start(() => dismiss(result));
+    }).start(() => {
+      if (animatingOutRef.current) {
+        return;
+      }
+      animatingOutRef.current = true;
+      dismiss(result);
+    });
   };
 
   return (
