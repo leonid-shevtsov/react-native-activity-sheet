@@ -94,7 +94,12 @@ function SlideOutFromTheBottomModal<T>({
 
   const slideOutOffset = React.useRef(new Animated.Value(0));
 
+  const animatingOutRef = React.useRef(false);
+
   React.useEffect(() => {
+    if (animatingOutRef.current) {
+      return;
+    }
     if (height < 0 || bottomOffset < 0) {
       return;
     }
@@ -112,8 +117,11 @@ function SlideOutFromTheBottomModal<T>({
     ]).start();
   }, [height, bottomOffset, fullOverlayOpacity]);
 
-  const animatingOutRef = React.useRef(false);
   const animateOut = (result: T | undefined) => {
+    if (animatingOutRef.current) {
+      return;
+    }
+    animatingOutRef.current = true;
     Animated.parallel([
       Animated.timing(slideOutOffset.current, {
         toValue: 0,
@@ -125,13 +133,7 @@ function SlideOutFromTheBottomModal<T>({
         duration: disappearDuration,
         useNativeDriver: true
       })
-    ]).start(() => {
-      if (animatingOutRef.current) {
-        return;
-      }
-      animatingOutRef.current = true;
-      dismiss(result);
-    });
+    ]).start(() => dismiss(result));
   };
 
   React.useEffect(() => {
@@ -252,7 +254,14 @@ function DisplayInTheCenterModal<T>({
 
   const opacity = React.useRef(new Animated.Value(0));
 
+  const animatingOutRef = React.useRef(false);
+
   React.useEffect(() => {
+    // not sure if this is necessary in this case because the animation starts
+    // immediately and does not update later, but it's better to be safe
+    if (animatingOutRef.current) {
+      return;
+    }
     Animated.timing(opacity.current, {
       toValue: 1,
       duration: fadeInDuration,
@@ -260,19 +269,16 @@ function DisplayInTheCenterModal<T>({
     }).start();
   }, []);
 
-  const animatingOutRef = React.useRef(false);
   const animateOut = (result: T | undefined) => {
+    if (animatingOutRef.current) {
+      return;
+    }
+    animatingOutRef.current = true;
     Animated.timing(opacity.current, {
       toValue: 0,
       duration: fadeOutDuration,
       useNativeDriver: true
-    }).start(() => {
-      if (animatingOutRef.current) {
-        return;
-      }
-      animatingOutRef.current = true;
-      dismiss(result);
-    });
+    }).start(() => dismiss(result));
   };
 
   return (
