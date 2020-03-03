@@ -69,13 +69,22 @@ function SlideOutFromTheBottomModal<T>({
   const [parentHeight, setParentHeight] = React.useState(-1);
   const [bottomOffset, setBottomOffset] = React.useState(-1);
   const [height, setHeight] = React.useState(-1);
+  const [screenHeight, setScreenHeight] = React.useState(
+    () => Dimensions.get("screen").height
+  );
+
+  React.useEffect(() => {
+    const handler = ({ screen: { height } }) => setScreenHeight(height);
+    Dimensions.addEventListener("change", handler);
+    return () => Dimensions.removeEventListener("change", handler);
+  }, []);
 
   // iphone X needs a special inset
   const bottomInset =
     Platform.OS === "ios" &&
     !Platform.isPad &&
     !Platform.isTVOS &&
-    (parentHeight === iphoneXHeight || parentHeight === iphoneXMaxHeight)
+    (screenHeight === iphoneXHeight || screenHeight === iphoneXMaxHeight)
       ? iphoneXInset
       : 0;
 
