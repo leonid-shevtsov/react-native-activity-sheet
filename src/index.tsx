@@ -74,7 +74,8 @@ function SlideOutFromTheBottomModal<T>({
   );
 
   React.useEffect(() => {
-    const handler = ({ screen: { height } }) => setScreenHeight(height);
+    const handler = ({ screen: { height } }: { screen: { height: number } }) =>
+      setScreenHeight(height);
     Dimensions.addEventListener("change", handler);
     return () => Dimensions.removeEventListener("change", handler);
   }, []);
