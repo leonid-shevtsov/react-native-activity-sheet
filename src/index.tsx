@@ -10,9 +10,9 @@ import {
   TouchableHighlight,
   TouchableWithoutFeedback,
   View,
-  Text
+  Text,
+  useColorScheme
 } from "react-native";
-import { useDarkMode } from "react-native-dark-mode";
 
 import actionSheetStyles, {
   darkPalette,
@@ -58,7 +58,7 @@ function SlideOutFromTheBottomModal<T>({
 }: ActivitySheetProps<T>) {
   const opacity = React.useRef(new Animated.Value(0));
 
-  const isDarkMode = useDarkMode();
+  const isDarkMode = useColorScheme() === "dark";
   const fullOverlayOpacity = isDarkMode
     ? fullOverlayOpacityDark
     : fullOverlayOpacityLight;
@@ -259,7 +259,7 @@ function DisplayInTheCenterModal<T>({
   dismiss,
   children
 }: ActivitySheetProps<T>) {
-  const isDarkMode = useDarkMode();
+  const isDarkMode = useColorScheme() === "dark";
   const colors = isDarkMode ? darkPalette : lightPalette;
 
   const opacity = React.useRef(new Animated.Value(0));

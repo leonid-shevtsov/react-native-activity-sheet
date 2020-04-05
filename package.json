@@ -9,13 +9,13 @@
   "license": "MIT",
   "peerDependencies": {
     "react": "^16.11.0",
-    "react-native": "^0.61.4",
-    "react-native-dark-mode": "^0.2.0"
+    "react-native": "^0.62"
   },
   "devDependencies": {
     "@types/react": "^16.9.11",
-    "@types/react-native": "^0.60.22",
-    "typescript": "^3.7.0"
+    "@types/react-native": "^0.62",
+    "typescript": "^3.7.0",
+    "prettier": "^2"
   },
   "scripts": {
     "prepublish": "node_modules/.bin/tsc"
