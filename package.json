@@ -1,6 +1,6 @@
 {
   "name": "react-native-activity-sheet",
-  "version": "1.0.0-alpha-9",
+  "version": "1.0.0-alpha-10",
   "description": "React Native component that replicates the appearance of IOS' Activity Sheets",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -14,8 +14,8 @@
   "devDependencies": {
     "@types/react": "^16.9.11",
     "@types/react-native": "^0.62",
-    "typescript": "^3.7.0",
-    "prettier": "^2"
+    "prettier": "^2",
+    "typescript": "^3.7.0"
   },
   "scripts": {
     "prepublish": "node_modules/.bin/tsc"
