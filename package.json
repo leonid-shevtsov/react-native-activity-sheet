@@ -1,6 +1,6 @@
 {
   "name": "react-native-activity-sheet",
-  "version": "1.0.0-alpha-10",
+  "version": "1.0.0-alpha-11",
   "description": "React Native component that replicates the appearance of IOS' Activity Sheets",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
