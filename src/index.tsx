@@ -2,6 +2,7 @@ import * as React from "react";
 import {
   Animated,
   Dimensions,
+  Easing,
   Keyboard,
   KeyboardEvent,
   LayoutChangeEvent,
@@ -23,7 +24,8 @@ const overlayBackgroundColor = "black";
 const shadowColor = "black";
 const fullOverlayOpacityLight = 0.2;
 const fullOverlayOpacityDark = 0.5;
-const appearDuration = 280;
+const appearDuration = 400;
+const appearEasing = Easing.bezier(0.23, 1.0, 0.32, 1.0); // ease-out-quint
 const disappearDuration = 100;
 const fadeInDuration = 50;
 const fadeOutDuration = 200;
@@ -117,6 +119,7 @@ function SlideOutFromTheBottomModal<T>({
       Animated.timing(slideOutOffset.current, {
         toValue: 1,
         duration: appearDuration,
+        easing: appearEasing,
         useNativeDriver: true
       }),
       Animated.timing(opacity.current, {
