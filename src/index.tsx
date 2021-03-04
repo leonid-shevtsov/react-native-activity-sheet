@@ -8,13 +8,12 @@ import {
   LayoutChangeEvent,
   Platform,
   ScaledSize,
+  Text,
   TouchableHighlight,
   TouchableWithoutFeedback,
-  View,
-  Text,
-  useColorScheme
+  useColorScheme,
+  View
 } from "react-native";
-
 import actionSheetStyles, {
   darkPalette,
   lightPalette
@@ -58,22 +57,21 @@ function SlideOutFromTheBottomModal<T>({
   cancelText = "Cancel",
   cancelColor = "#0076FF"
 }: ActivitySheetProps<T>) {
-  const opacity = React.useRef(new Animated.Value(0));
-
   const isDarkMode = useColorScheme() === "dark";
   const fullOverlayOpacity = isDarkMode
     ? fullOverlayOpacityDark
     : fullOverlayOpacityLight;
+  // initial animation now done with react native navigation; change to 0 and enable animation below if need it again
+  // const opacity = React.useRef(new Animated.Value(0));
 
   const colors = isDarkMode ? darkPalette : lightPalette;
 
-  const [keyboardY, setKeyboardY] = React.useState(-1);
-  const [parentHeight, setParentHeight] = React.useState(-1);
-  const [bottomOffset, setBottomOffset] = React.useState(-1);
-  const [height, setHeight] = React.useState(-1);
+  const [keyboardY, setKeyboardY] = React.useState(0);
+  const [innerHeight, setInnerHeight] = React.useState(-1);
   const [screenHeight, setScreenHeight] = React.useState(
     () => Dimensions.get("screen").height
   );
+  const [parentHeight, setParentHeight] = React.useState(() => screenHeight);
 
   React.useEffect(() => {
     const handler = ({ screen: { height } }: { screen: { height: number } }) =>
@@ -83,26 +81,35 @@ function SlideOutFromTheBottomModal<T>({
   }, []);
 
   // iphone X needs a special inset
-  const bottomInset =
-    Platform.OS === "ios" &&
-    !Platform.isPad &&
-    !Platform.isTVOS &&
-    (screenHeight === iphoneXHeight || screenHeight === iphoneXMaxHeight)
-      ? iphoneXInset
-      : 0;
+  const bottomInset = React.useMemo(() => {
+    if (
+      safeBottom &&
+      Platform.OS === "ios" &&
+      !Platform.isPad &&
+      !Platform.isTVOS &&
+      (screenHeight === iphoneXHeight || screenHeight === iphoneXMaxHeight)
+    ) {
+      return iphoneXInset;
+    }
+
+    return 0;
+  }, [safeBottom, screenHeight]);
+
+  const [bottomOffset, setBottomOffset] = React.useState(bottomInset);
 
   React.useEffect(() => {
-    if (parentHeight < 0 || bottomInset < 0) {
+    if (parentHeight < 0) {
       return;
     }
-    if (keyboardY > 0 && keyboardY < parentHeight) {
-      setBottomOffset(parentHeight - keyboardY);
-    } else if (safeBottom) {
-      setBottomOffset(bottomInset);
-    } else {
-      setBottomOffset(0);
+    const newBottomOffset =
+      keyboardY > 0 && keyboardY < parentHeight
+        ? parentHeight - keyboardY
+        : bottomInset;
+
+    if (newBottomOffset != bottomOffset) {
+      setBottomOffset(newBottomOffset);
     }
-  }, [keyboardY, bottomInset, parentHeight, safeBottom]);
+  }, [keyboardY, bottomInset, parentHeight, safeBottom, bottomOffset]);
 
   const slideOutOffset = React.useRef(new Animated.Value(0));
 
@@ -112,41 +119,43 @@ function SlideOutFromTheBottomModal<T>({
     if (animatingOutRef.current) {
       return;
     }
-    if (height < 0 || bottomOffset < 0) {
+    if (innerHeight < 0 || bottomOffset < 0) {
       return;
     }
-    Animated.parallel([
-      Animated.timing(slideOutOffset.current, {
-        toValue: 1,
-        duration: appearDuration,
-        easing: appearEasing,
-        useNativeDriver: true
-      }),
-      Animated.timing(opacity.current, {
-        toValue: fullOverlayOpacity,
-        duration: appearDuration,
-        useNativeDriver: true
-      })
-    ]).start();
-  }, [height, bottomOffset, fullOverlayOpacity]);
+    // skip opacity animation because it is done with
+    // Animated.timing(opacity.current, {
+    //   toValue: fullOverlayOpacity,
+    //   duration: appearDuration,
+    //   useNativeDriver: true,
+    // }),
+
+    const appearAnimation = Animated.timing(slideOutOffset.current, {
+      toValue: 1,
+      duration: appearDuration,
+      easing: appearEasing,
+      useNativeDriver: true
+    });
+    appearAnimation.start();
+    return () => appearAnimation.stop();
+  }, [innerHeight, bottomOffset]);
 
   const animateOut = (result: T | undefined) => {
     if (animatingOutRef.current) {
       return;
     }
     animatingOutRef.current = true;
-    Animated.parallel([
-      Animated.timing(slideOutOffset.current, {
-        toValue: 0,
-        duration: disappearDuration,
-        useNativeDriver: true
-      }),
-      Animated.timing(opacity.current, {
-        toValue: 0,
-        duration: disappearDuration,
-        useNativeDriver: true
-      })
-    ]).start(() => dismiss(result));
+
+    // Animated.timing(opacity.current, {
+    //   toValue: 0,
+    //   duration: disappearDuration,
+    //   useNativeDriver: true,
+    // }),
+
+    Animated.timing(slideOutOffset.current, {
+      toValue: 0,
+      duration: disappearDuration,
+      useNativeDriver: true
+    }).start(() => dismiss(result));
   };
 
   React.useEffect(() => {
@@ -176,11 +185,11 @@ function SlideOutFromTheBottomModal<T>({
       onPress={() => animateOut(undefined)}
       style={{ height: "100%", width: "100%" }}
     >
-      <View>
-        <Animated.View
+      <>
+        <View
           style={{
             backgroundColor: overlayBackgroundColor,
-            opacity: opacity.current,
+            opacity: fullOverlayOpacity,
             height: "100%",
             width: "100%",
             position: "absolute"
@@ -203,21 +212,21 @@ function SlideOutFromTheBottomModal<T>({
                 flexDirection: "column",
                 justifyContent: "flex-end"
               },
-              height < 0 || bottomOffset < 0
+              innerHeight < 0 || bottomOffset < 0
                 ? null
                 : {
                     transform: [
                       {
                         translateY: slideOutOffset.current.interpolate({
                           inputRange: [0, 1],
-                          outputRange: [0, -height - bottomOffset]
+                          outputRange: [0, -innerHeight - bottomOffset]
                         })
                       }
                     ]
                   }
             ]}
             onLayout={(event: LayoutChangeEvent) =>
-              setHeight(event.nativeEvent.layout.height)
+              setInnerHeight(event.nativeEvent.layout.height)
             }
           >
             {showFrame ? (
@@ -253,7 +262,7 @@ function SlideOutFromTheBottomModal<T>({
             )}
           </Animated.View>
         </View>
-      </View>
+      </>
     </TouchableWithoutFeedback>
   );
 }
